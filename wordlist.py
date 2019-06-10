@@ -1,82 +1,91 @@
-from unicodedata import normalize # Para remover acentos e ç dos nomes: Retirado de: https://wiki.python.org.br/RemovedorDeAcentos
+# Estudo feito pela Axur mostra o perfil de senhas do brasileiro: 
+# https://blog.axur.com/pt/infografico-perfil-da-senha-do-brasileiro
+# Este estudo me fez adicionar outros templates de senha.
+
+# Para remover acentos e ç dos nomes;
+# Retirado de: https://wiki.python.org.br/RemovedorDeAcentos
+# Medida adotada, pois caracteres assim não são aceitos atualmente
+from unicodedata import normalize
+from datetime import date
 
 print ("""  
 + Criaremos wordlists personalizadas.
-+ 22.05.2019
++ 06.05.2019
 + Jim Nadab.
             
 Forneça os dados que trabalharemos.
             
             """)
 
-# Iniciando a coleta de informações. Afinal, é uma wordlist personalizada.
+# Iniciando a coleta de informações.
 tamanho_minimo = input("Qual o tamanho mínimo, das senhas que criaremos? ")
 
-while not str.isnumeric(tamanho_minimo) or int(tamanho_minimo) < 6: # Verificando se apenas números foram digitados.
+# Garantindo que apenas numeros tenham sido digitados.
+# Por padrão estou exigindo um tamanha mínimo de 6 digitos.
+while not str.isnumeric(tamanho_minimo) or int(tamanho_minimo) < 6:
         tamanho_minimo = input("\nDigite apenas um número inteiro, maior ou igual a 6: ")
 
+# Função para garantir a integridade nos nomes.
+def bons_nomes (nome):
+    
+    # Nomes em branco ou com caracteres não alfabéticos não são permitidos
+    while len(str.split(nome)) == 0 or not str.isalpha(nome.replace(' ', '')):
+        nome = input("\nDigite um nome válido: ")
+
+    # Para remover os acentos e cedilhas.
+    nome =  normalize('NFKD', nome).encode('ASCII', 'ignore').decode('ASCII')
+
+    return nome
+
+# Função para garantir a integridade das datas.
+def boas_datas (data):
+
+    # Garantindo que seja digitado apenas y ou n.
+    while (data != 'y' and data != 'n'): 
+        data = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
+
+    if data == 'y':
+        data = input("\nQual a data? (DDMMAAAA): ")
+        
+        # Verificando se apenas números foram digitados.
+        while not str.isnumeric(data) or len(data) != 8:
+            data = input("\nDigite apenas \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
+        
+        return data
+    else:
+        return False
+
+def aniversario (data):
+    data_atual = date.today()
+    
+    if data == False:
+        return False
+    elif (int(data_atual.year) - int(data[-4:])) <= 0:
+        return False
+    else:
+        return int(data_atual.year) - int(data[-4:])
+
+
 nome_completo_alvo = input("\nQual o nome completo do alvo? ")
-
-while len(str.split(nome_completo_alvo)) == 0 or not str.isalpha(nome_completo_alvo.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-    nome_completo_alvo = input("\nDigite um nome válido: ") 
-
-nome_completo_alvo =  normalize('NFKD', nome_completo_alvo).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+nome_completo_alvo = bons_nomes(nome_completo_alvo)
 data_nascimento_alvo = input("\nSabe a data de nascimento? (y/n): ")
-
-while (data_nascimento_alvo != 'y' and data_nascimento_alvo != 'n'): # Garantindo que seja digitado apenas y ou n.
-    data_nascimento_alvo = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-if data_nascimento_alvo == 'y':
-    data_nascimento_alvo = input("\nQual a data de nascimento? (DDMMAAAA): ")
-
-    while not str.isnumeric(data_nascimento_alvo) or len(data_nascimento_alvo) != 8: # Verificando se apenas números foram digitados.
-        data_nascimento_alvo = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-else:
-    data_nascimento_alvo = False
+data_nascimento_alvo = boas_datas(data_nascimento_alvo)
 
 casado = str.lower(input("\nO \"alvo\" é casado(a)? (y/n): "))
-
 while (casado != 'y' and casado != 'n'):
     casado = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
 if casado == 'y':
-    casado = True
     nome_completo_conjuge = input("\nQual o nome completo do cônjuge? ")
-
-    while len(str.split(nome_completo_conjuge)) == 0 or not str.isalpha(nome_completo_conjuge.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-        nome_completo_conjuge = input("\nDigite um nome válido: ")
-
-    nome_completo_conjuge =  normalize('NFKD', nome_completo_conjuge).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+    nome_completo_conjuge = bons_nomes(nome_completo_conjuge)
     data_nascimento_conjuge = input("\nSabe a data de nascimento do cônjuge? (y/n): ")
-
-    while (data_nascimento_conjuge != 'y' and data_nascimento_conjuge != 'n'): # Garantindo que seja digitado apenas y ou n.
-        data_nascimento_conjuge = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-    if data_nascimento_conjuge == 'y':
-        data_nascimento_conjuge = input("\nQual a data de nascimento do cônjuge? (DDMMAAAA): ")
-
-        while not str.isnumeric(data_nascimento_conjuge) or len(data_nascimento_conjuge) != 8: # Verificando se apenas números foram digitados.
-            data_nascimento_conjuge = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-    else:
-        data_nascimento_conjuge = False
-
+    data_nascimento_conjuge = boas_datas(data_nascimento_conjuge)
     data_casamento = input("\nSabe a data de casamento? (y/n): ")
-    
-    while (data_casamento != 'y' and data_casamento != 'n'): # Garantindo que seja digitado apenas y ou n.
-        data_casamento = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-    
-    if data_casamento == 'y':
-        data_casamento = input("\nQual a data de casamento? (DDMMAAAA): ")
-    
-        while not str.isnumeric(data_casamento) or len(data_casamento) != 8: # Verificando se apenas números foram digitados.
-            data_casamento = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-    else:
-        data_casamento = False
+    data_casamento = boas_datas(data_casamento)
 else:
     casado = False
 
 filhos = str.lower(input("\nPossui filhos? (y/n): "))
-
 while (filhos != 'y' and filhos != 'n'):
     filhos = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
@@ -92,170 +101,66 @@ if filhos == 'y':
     
     if filhos == 1:
         nome_completo_primeiro_filho = input("\nQual o nome do primeiro filho? ")
-
-        while len(str.split(nome_completo_primeiro_filho)) == 0 or not str.isalpha(nome_completo_primeiro_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_primeiro_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_primeiro_filho =  normalize('NFKD', nome_completo_primeiro_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_primeiro_filho = bons_nomes(nome_completo_primeiro_filho)
         data_nascimento_primeiro_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_primeiro_filho != 'y' and data_nascimento_primeiro_filho != 'n'):
-            data_nascimento_primeiro_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_primeiro_filho == 'y':
-            data_nascimento_primeiro_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_primeiro_filho) or len(data_nascimento_primeiro_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_primeiro_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_primeiro_filho = False
+        data_nascimento_primeiro_filho = boas_datas(data_nascimento_primeiro_filho)
     
     if filhos == 2:
         nome_completo_primeiro_filho = input("\nQual o nome do primeiro filho? ")
-
-        while len(str.split(nome_completo_primeiro_filho)) == 0 or not str.isalpha(nome_completo_primeiro_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_primeiro_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_primeiro_filho =  normalize('NFKD', nome_completo_primeiro_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_primeiro_filho = bons_nomes(nome_completo_primeiro_filho)
         data_nascimento_primeiro_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_primeiro_filho != 'y' and data_nascimento_primeiro_filho != 'n'):
-            data_nascimento_primeiro_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_primeiro_filho == 'y':
-            data_nascimento_primeiro_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_primeiro_filho) or len(data_nascimento_primeiro_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_primeiro_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_primeiro_filho = False
+        data_nascimento_primeiro_filho = boas_datas(data_nascimento_primeiro_filho)
 
         nome_completo_segundo_filho = input("\nQual o nome do segundo filho? ")
-
-        while len(str.split(nome_completo_segundo_filho)) == 0 or not str.isalpha(nome_completo_segundo_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_segundo_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_segundo_filho =  normalize('NFKD', nome_completo_segundo_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_segundo_filho = bons_nomes(nome_completo_segundo_filho)
         data_nascimento_segundo_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_segundo_filho != 'y' and data_nascimento_segundo_filho != 'n'):
-            data_nascimento_segundo_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_segundo_filho == 'y':
-            data_nascimento_segundo_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_segundo_filho) or len(data_nascimento_segundo_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_segundo_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_segundo_filho = False
+        data_nascimento_segundo_filho = boas_datas(data_nascimento_segundo_filho)
 
     if filhos == 3:
         nome_completo_primeiro_filho = input("\nQual o nome do primeiro filho? ")
-
-        while len(str.split(nome_completo_primeiro_filho)) == 0 or not str.isalpha(nome_completo_primeiro_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_primeiro_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_primeiro_filho =  normalize('NFKD', nome_completo_primeiro_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_primeiro_filho = bons_nomes(nome_completo_primeiro_filho)
         data_nascimento_primeiro_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_primeiro_filho != 'y' and data_nascimento_primeiro_filho != 'n'):
-            data_nascimento_primeiro_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_primeiro_filho == 'y':
-            data_nascimento_primeiro_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_primeiro_filho) or len(data_nascimento_primeiro_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_primeiro_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_primeiro_filho = False
+        data_nascimento_primeiro_filho = boas_datas(data_nascimento_primeiro_filho)
 
         nome_completo_segundo_filho = input("\nQual o nome do segundo filho? ")
-
-        while len(str.split(nome_completo_segundo_filho)) == 0 or not str.isalpha(nome_completo_segundo_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_segundo_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_segundo_filho =  normalize('NFKD', nome_completo_segundo_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_segundo_filho = bons_nomes(nome_completo_segundo_filho)
         data_nascimento_segundo_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_segundo_filho != 'y' and data_nascimento_segundo_filho != 'n'):
-            data_nascimento_segundo_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_segundo_filho == 'y':
-            data_nascimento_segundo_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_segundo_filho) or len(data_nascimento_segundo_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_segundo_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_segundo_filho = False
+        data_nascimento_segundo_filho = boas_datas(data_nascimento_segundo_filho)
 
         nome_completo_terceiro_filho = input("\nQual o nome do terceiro filho? ")
-
-        while len(str.split(nome_completo_terceiro_filho)) == 0 or not str.isalpha(nome_completo_terceiro_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_terceiro_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_terceiro_filho =  normalize('NFKD', nome_completo_terceiro_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_terceiro_filho = bons_nomes(nome_completo_terceiro_filho)
         data_nascimento_terceiro_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_terceiro_filho != 'y' and data_nascimento_terceiro_filho != 'n'):
-            data_nascimento_terceiro_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_terceiro_filho == 'y':
-            data_nascimento_terceiro_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_terceiro_filho) or len(data_nascimento_terceiro_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_terceiro_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_terceiro_filho = False
+        data_nascimento_terceiro_filho = boas_datas(data_nascimento_terceiro_filho)
 
     if filhos > 3: 
         nome_completo_ultimo_filho = input("\nQual o nome do filho mais novo? ")
-
-        while len(str.split(nome_completo_ultimo_filho)) == 0 or not str.isalpha(nome_completo_ultimo_filho.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-            nome_completo_ultimo_filho = input("\nDigite um nome válido: ")
-
-        nome_completo_ultimo_filho =  normalize('NFKD', nome_completo_ultimo_filho).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+        nome_completo_ultimo_filho = bons_nomes(nome_completo_ultimo_filho)
         data_nascimento_ultimo_filho = input("\nSabe a data de nascimento? (y/n): ")
-        
-        while (data_nascimento_ultimo_filho != 'y' and data_nascimento_ultimo_filho != 'n'):
-            data_nascimento_terceiro_filho = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-        if data_nascimento_ultimo_filho == 'y':
-            data_nascimento_ultimo_filho = input("\nQual a data de nascimento? (DDMMAAAA): ")
-            while not str.isnumeric(data_nascimento_ultimo_filho) or len(data_nascimento_ultimo_filho) != 8: # Verificando se apenas números foram digitados.
-                data_nascimento_ultimo_filho = input("\nDigite \"OITO\" números com a seguinte formatação \"DDYYAAAA\": ")
-        else:
-            data_nascimento_ultimo_filho = False
+        data_nascimento_ultimo_filho = boas_datas(data_nascimento_ultimo_filho)
 else:
     filhos = False
 
 animal_estimacao = str.lower(input("\nPossui animal de estimação? (y/n): "))
-
 while (animal_estimacao != 'y' and animal_estimacao != 'n'):
     animal_estimacao = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
 if animal_estimacao == 'y':
-    animal = True
     animal_estimacao = input("\nQual o nome? ")
-
-    while len(str.split(animal_estimacao)) == 0 or not str.isalpha(animal_estimacao.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-        animal_estimacao = input("\nDigite um nome válido: ")
-
-    animal_estimacao =  normalize('NFKD', animal_estimacao).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+    animal_estimacao = bons_nomes(animal_estimacao)
 else:
-    animal = False
+    animal_estimacao = False
 
 empresa_alvo = str.lower(input("\nO \"alvo\" trabalha? (y/n): "))
-
 while (empresa_alvo != 'y' and empresa_alvo != 'n'):
     empresa_alvo = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
 if empresa_alvo == 'y':
-    empregado = True
     empresa_alvo = input("\n Qual o nome da empresa onde o \"alvo\" trabalha? ")
-
-    while len(str.split(empresa_alvo)) == 0 or not str.isalpha(empresa_alvo.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-        empresa_alvo = input("\nDigite um nome válido: ")
-
-    empresa_alvo =  normalize('NFKD', empresa_alvo).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+    empresa_alvo = bons_nomes(empresa_alvo)
 else:
-    empregado = False
+    empresa_alvo = False
 
 religioso = str.lower(input("\nO \"alvo\" é religioso? (y/n): "))
-
 while (religioso != 'y' and religioso != 'n'):
     religioso = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
@@ -270,112 +175,52 @@ while (time != 'y' and time != 'n'):
     time = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
 if time == 'y':
-    torcedor = True
     time = input("\nQual? ")
-
-    while len(str.split(time)) == 0 or not str.isalpha(time.replace(' ', '')):  # garantindo que o nome não esteja em branco e contenha caracteres não alfabéticos.
-        time = input("\nDigite um nome válido: ")
-
-    time =  normalize('NFKD', time).encode('ASCII', 'ignore').decode('ASCII') # Removido os acentos.
+    time = bons_nomes(time)
 else:
-    torcedor = False
+    time = False
 
 # Oranizando os dados para facilitar a manipulação:
-print("\nAnalisando os dados fornecidos.")
+print("\nOrganizando os dados fornecidos.")
 
 lista_nomes_alvo = str.split(nome_completo_alvo)
 
-if data_nascimento_alvo != False:
-    dia_alvo = data_nascimento_alvo[:2]
-    mes_alvo = data_nascimento_alvo[2:4]
-    ano_alvo = data_nascimento_alvo[4:]
-
 if casado:
     lista_nomes_conjuge = str.split(nome_completo_conjuge)
-    
-    if data_nascimento_conjuge != False:
-    
-        dia_conjuge = data_nascimento_conjuge[:2]
-        mes_conjuge = data_nascimento_conjuge[2:4]
-        ano_conjuge = data_nascimento_conjuge[4:]
-
-    if data_casamento != False:
-        dia_casamento = data_casamento[:2]
-        mes_casamento = data_casamento[2:4]
-        ano_casamento = data_casamento[4:]
 
 if filhos == 1:
     lista_nomes_primeiro_filho = str.split(nome_completo_primeiro_filho)
-    
-    if data_nascimento_primeiro_filho != False:
-        dia_primeiro_filho = data_nascimento_primeiro_filho[:2]
-        mes_primeiro_filho = data_nascimento_primeiro_filho[2:4]
-        ano_primeiro_filho = data_nascimento_primeiro_filho[4:]
 
 if filhos == 2:
     lista_nomes_primeiro_filho = str.split(nome_completo_primeiro_filho)
-    
-    if data_nascimento_primeiro_filho != False:
-        dia_primeiro_filho = data_nascimento_primeiro_filho[:2]
-        mes_primeiro_filho = data_nascimento_primeiro_filho[2:4]
-        ano_primeiro_filho = data_nascimento_primeiro_filho[4:]
-
     lista_nomes_segundo_filho = str.split(nome_completo_segundo_filho)
-    
-    if data_nascimento_segundo_filho != False:
-        dia_segundo_filho = data_nascimento_segundo_filho[:2]
-        mes_segundo_filho = data_nascimento_segundo_filho[2:4]
-        ano_segundo_filho = data_nascimento_segundo_filho[4:]
 
 if filhos == 3:
     lista_nomes_primeiro_filho = str.split(nome_completo_primeiro_filho)
-    
-    if data_nascimento_primeiro_filho != False:
-        dia_primeiro_filho = data_nascimento_primeiro_filho[:2]
-        mes_primeiro_filho = data_nascimento_primeiro_filho[2:4]
-        ano_primeiro_filho = data_nascimento_primeiro_filho[4:]
-
     lista_nomes_segundo_filho = str.split(nome_completo_segundo_filho)
-    
-    if data_nascimento_segundo_filho != False:
-        dia_segundo_filho = data_nascimento_segundo_filho[:2]
-        mes_segundo_filho = data_nascimento_segundo_filho[2:4]
-        ano_segundo_filho = data_nascimento_segundo_filho[4:]
-
     lista_nomes_terceiro_filho = str.split(nome_completo_terceiro_filho)
-    
-    if data_nascimento_terceiro_filho != False:
-        dia_terceiro_filho = data_nascimento_terceiro_filho[:2]
-        mes_terceiro_filho = data_nascimento_terceiro_filho[2:4]
-        ano_terceiro_filho = data_nascimento_terceiro_filho[4:]
 
 if filhos > 3:
     lista_nomes_ultimo_filho = str.split(nome_completo_ultimo_filho)
-    
-    if data_nascimento_ultimo_filho != False:
-        dia_ultimo_filho = data_nascimento_ultimo_filho[:2]
-        mes_ultimo_filho = data_nascimento_ultimo_filho[2:4]
-        ano_ultimo_filho = data_nascimento_ultimo_filho[4:]
 
-if animal:
+if animal_estimacao != False:
     lista_animal = str.split(animal_estimacao)
 
-if empregado:
+if empresa_alvo != False:
     lista_empresa = str.split(empresa_alvo)
 
-if torcedor:
+if time != False:
     lista_time = str.split(time)
 
 if religioso:
     palavras_religiosas = ['Jesus', 'Cristo', 'Deus', 'Jesusvoltara', 'soJesussalva', 'Jesusestavoltando', 'EspiritoSanto', 'JesusCristo']
 
-# O arquivo .txt, que conterá a wordlist terá o primeiro nome do usuário.
+# O arquivo .txt que conterá a wordlist terá o primeiro nome do usuário.
 arquivo = str.capitalize(lista_nomes_alvo[0]) + '.txt'    
 
 # Hora do show!
-
-lista_gravar = []
 gravado = True
+lista_provisoria = []
 
 def gravar(lista):
 
@@ -395,132 +240,102 @@ def gravar(lista):
         
         f.close()
 
-def nomes(lista, data):
+def letras_e_datas(lista, data):
+    
+    listavazia = []
 
-    # Esta função, para o exemplo "Junior Alves Quinto Terceiro", nascido em 18081900, cria os seguintes templates:
-    # junior; Junior; jUNIOR; JUNIOR; junioalves; JuniorAlves; JUNIORALVES;
-    # juniorterceiro; JuniorTerceiro; JUNIORTERCEIRO; JuniorAT; juniorat; JUNIORAT;
-    # junior18; Junior18; jUNIOR18; JUNIOR18; junioalves18; JuniorAlves18; JUNIORALVES18;
-    # juniorterceiro18; JuniorTerceiro18; JUNIORTERCEIRO18; JuniorAT18; juniorat18; JUNIORAT18;
-    # junior1900; Junior1900; jUNIOR1900; JUNIOR1900; junioalves1900; JuniorAlves1900; JUNIORALVES1900;
-    # juniorterceiro1900; JuniorTerceiro1900; JUNIORTERCEIRO1900; JuniorAT1900; juniorat1900; JUNIORAT1900;
-    # junior90; Junior90; jUNIOR90; JUNIOR90; junioalves90; JuniorAlves90; JUNIORALVES90;
-    # juniorterceiro90; JuniorTerceiro90; JUNIORTERCEIRO90; JuniorAT90; juniorat90; JUNIORAT90;
+    if data:
+        for i in range(len(lista)):
+            listavazia.append(lista[i])
+            listavazia.append(lista[i]+data[:])
+            listavazia.append(lista[i]+data[:2])
+            listavazia.append(lista[i]+data[-4:])
+            listavazia.append(lista[i]+data[-2:])
+
+            idade = aniversario(data)
+            x = 0
+
+            while x < 5 and idade > 0:
+                listavazia.append(lista[i]+str(idade))
+                x += 1
+                idade -= 1
+    else:
+        for i in range(len(lista)):
+            listavazia.append(lista[i])
+
+    for i in range(len(listavazia)):
+        lista_provisoria.append(listavazia[i])
+
+
+def so_letras (lista, data):
 
     tamanho = len(lista)
+    listavazia = []
 
     for i in range(tamanho):
         
-        if lista[i] not in lista_gravar:                                     # garantindo que não existam palavras repetidas no .txt
-            lista_gravar.append(str.lower(lista[i]))                         # todas minúsculas    
-            lista_gravar.append(str.capitalize(lista[i]))                    # apenas a primeira maiúscula
-            lista_gravar.append(str.swapcase(str.capitalize(lista[i])))      # primeira minúscula, o resto maiúscula
-            lista_gravar.append(str.upper(lista[i]))                         # todas maiúsculas
-
-            if data:
-                lista_gravar.append(str.lower(lista[i]+data[:2]))
-                lista_gravar.append(str.capitalize(lista[i]+data[:2])) 
-                lista_gravar.append(str.swapcase(str.capitalize(lista[i]+data[:2])))
-                lista_gravar.append(str.upper(lista[i]+data[:2]))
-                lista_gravar.append(str.lower(lista[i]+data[4:]))
-                lista_gravar.append(str.capitalize(lista[i]+data[4:])) 
-                lista_gravar.append(str.swapcase(str.capitalize(lista[i]+data[4:])))
-                lista_gravar.append(str.upper(lista[i]+data[4:]))  
-                lista_gravar.append(str.lower(lista[i]+data[6:]))
-                lista_gravar.append(str.capitalize(lista[i]+data[6:])) 
-                lista_gravar.append(str.swapcase(str.capitalize(lista[i]+data[6:])))
-                lista_gravar.append(str.upper(lista[i]+data[6:]))                  
-
+        if lista[i] not in listavazia:                                        # garantindo que não existam palavras repetidas no .txt
+            listavazia.append(str.lower(lista[i]))                            # junior, alves, quinto, terceiro    
+            listavazia.append(str.capitalize(lista[i]))                       # Junior, Alves, Quinto, Terceiro
+            listavazia.append(str.swapcase(str.capitalize(lista[i])))         # jUNIOR, aLVES, qUINTO, tERCEIRO
+            listavazia.append(str.upper(lista[i]))                            # JUNIOR, ALVES, QUINTO, TERCEIRO
 
     if tamanho == 2:
-        lista_gravar.append(str.lower(lista[0]+lista[1]))                       # primeiro nome + segundo nome, minúsculos
-        lista_gravar.append(str.upper(lista[0]+lista[1]))                       # primeiro nome + segundo nome, maiúsculos
-        lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]))  # primeiro nome + segundo nome, com as iniciais maiúsculas
-
-        if data:
-            lista_gravar.append(str.lower(lista[0]+lista[1]+data[:2]))                       
-            lista_gravar.append(str.upper(lista[0]+lista[1]+data[:2]))                       
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]+data[:2])) 
-            lista_gravar.append(str.lower(lista[0]+lista[1]+data[4:]))                       
-            lista_gravar.append(str.upper(lista[0]+lista[1]+data[4:]))                       
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]+data[4:]))
-            lista_gravar.append(str.lower(lista[0]+lista[1]+data[6:]))                       
-            lista_gravar.append(str.upper(lista[0]+lista[1]+data[6:]))                       
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]+data[6:]))    
-        
+        listavazia.append(str.lower(lista[0]+lista[1]))                       # primeiro nome + segundo nome, minúsculos
+        listavazia.append(str.upper(lista[0]+lista[1]))                       # primeiro nome + segundo nome, maiúsculos
+        listavazia.append(str.capitalize(lista[0])+str.capitalize(lista[1]))  # primeiro nome + segundo nome, com as iniciais maiúsculas
 
     if tamanho > 2:
-        lista_gravar.append(str.lower(lista[0]+lista[1]))                       # primeiro nome + segundo nome, minúsculos
-        lista_gravar.append(str.upper(lista[0]+lista[1]))                       # primeiro nome + segundo nome, maiúsculos
-        lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]))  # primeiro nome + segundo nome, com as iniciais maiúsculas
-        lista_gravar.append(str.lower(lista[0]+lista[-1]))                      # primeiro e último nome, minúsculos
-        lista_gravar.append(str.upper(lista[0]+lista[-1]))                      # primeiro e último nome, maiúsculos
-        lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[-1])) # primeiro e último nome, com as iniciais maiúsculas
+        listavazia.append(str.lower(lista[0]+lista[1]))                       # primeiro nome + segundo nome, minúsculos
+        listavazia.append(str.upper(lista[0]+lista[1]))                       # primeiro nome + segundo nome, maiúsculos
+        listavazia.append(str.capitalize(lista[0])+str.capitalize(lista[1]))  # primeiro nome + segundo nome, com as iniciais maiúsculas
+        listavazia.append(str.lower(lista[0]+lista[-1]))                      # primeiro e último nome, minúsculos
+        listavazia.append(str.upper(lista[0]+lista[-1]))                      # primeiro e último nome, maiúsculos
+        listavazia.append(str.capitalize(lista[0])+str.capitalize(lista[-1])) # primeiro e último nome, com as iniciais maiúsculas    
 
-        if data:
-            lista_gravar.append(str.lower(lista[0]+lista[1]+data[4:]))                       
-            lista_gravar.append(str.upper(lista[0]+lista[1]+data[4:]))                       
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]+data[4:]))  
-            lista_gravar.append(str.lower(lista[0]+lista[-1]+data[4:]))                      
-            lista_gravar.append(str.upper(lista[0]+lista[-1]+data[4:]))                      
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[-1]+data[4:]))
-            lista_gravar.append(str.lower(lista[0]+lista[1]+data[:2]))                       
-            lista_gravar.append(str.upper(lista[0]+lista[1]+data[:2]))                       
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]+data[:2]))  
-            lista_gravar.append(str.lower(lista[0]+lista[-1]+data[:2]))                      
-            lista_gravar.append(str.upper(lista[0]+lista[-1]+data[:2]))                      
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[-1]+data[:2]))
-            lista_gravar.append(str.lower(lista[0]+lista[1]+data[6:]))                       
-            lista_gravar.append(str.upper(lista[0]+lista[1]+data[6:]))                       
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[1]+data[6:]))  
-            lista_gravar.append(str.lower(lista[0]+lista[-1]+data[6:]))                      
-            lista_gravar.append(str.upper(lista[0]+lista[-1]+data[6:]))                      
-            lista_gravar.append(str.capitalize(lista[0])+str.capitalize(lista[-1]+data[6:]))
-        
-    temp = str.capitalize(lista[0])
+    temp = str.capitalize(lista[0])                 # para unir o primeiro nome com as demais iniciais
 
-    for a in range(tamanho-1):
-        temp += str.upper(lista[a+1][0])
+    for a in range(tamanho - 1):
+        temp += str.upper(lista[a+1][0])        
 
-    if temp not in lista_gravar:
-        lista_gravar.append(temp)
-        lista_gravar.append(str.lower(temp))
-        lista_gravar.append(str.upper(temp))
+    if temp not in listavazia:
+        listavazia.append(temp)
+        listavazia.append(str.lower(temp))
+        listavazia.append(str.upper(temp))
 
-        if data:
-            lista_gravar.append(temp+data[:2])
-            lista_gravar.append(str.lower(temp+data[:2]))
-            lista_gravar.append(str.upper(temp+data[:2]))
-            lista_gravar.append(temp+data[4:])
-            lista_gravar.append(str.lower(temp+data[4:]))
-            lista_gravar.append(str.upper(temp+data[4:]))
-            lista_gravar.append(temp+data[6:])
-            lista_gravar.append(str.lower(temp+data[6:]))
-            lista_gravar.append(str.upper(temp+data[6:]))
+    temp2 = str.lower(lista[0][0])                  # para unir as iniciais
+
+    for a in range(tamanho - 1):
+        temp2 += str.lower(lista[a+1][0])
+
+    if temp2 not in listavazia:
+        listavazia.append(temp2)
+        listavazia.append(str.upper(temp2))
+    
+    letras_e_datas(listavazia, data)
 
 
-
-nomes(lista_nomes_alvo, data_nascimento_alvo)
+so_letras(lista_nomes_alvo, data_nascimento_alvo)
 
 if casado:
- nomes(lista_nomes_conjuge, data_nascimento_conjuge)
+    so_letras(lista_nomes_conjuge, data_nascimento_conjuge)
 
 if filhos == 1:
- nomes(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
+    so_letras(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
 
 if filhos == 2:
- nomes(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
- nomes(lista_nomes_segundo_filho, data_nascimento_segundo_filho)
+    so_letras(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
+    so_letras(lista_nomes_segundo_filho, data_nascimento_segundo_filho)
 
 if filhos == 3:
- nomes(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
- nomes(lista_nomes_segundo_filho, data_nascimento_segundo_filho)
- nomes(lista_nomes_terceiro_filho, data_nascimento_terceiro_filho)
+    so_letras(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
+    so_letras(lista_nomes_segundo_filho, data_nascimento_segundo_filho)
+    so_letras(lista_nomes_terceiro_filho, data_nascimento_terceiro_filho)
 
 if filhos > 3:
- nomes(lista_nomes_ultimo_filho, data_nascimento_ultimo_filho)    
+    so_letras(lista_nomes_ultimo_filho)
 
-gravar(lista_gravar)
+gravar(lista_provisoria)
 
 print("\nGerando wordlist.")
 
@@ -528,4 +343,3 @@ if gravado:
     print("Wordlist " +arquivo+ " criada com sucesso.\n")
 else:
     print("Wordlist não pode ser gravada!\n")
-
