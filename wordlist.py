@@ -9,9 +9,9 @@ from unicodedata import normalize
 from datetime import date
 
 print ("""  
-+ Criaremos wordlists personalizadas.
-+ 06.05.2019
-+ Jim Nadab.
+: Criando uma wordlist personalizada.
+: 06.05.2019
+: Jim Nadab.
             
 Forneça os dados que trabalharemos.
             
@@ -35,7 +35,20 @@ def bons_nomes (nome):
     # Para remover os acentos e cedilhas.
     nome =  normalize('NFKD', nome).encode('ASCII', 'ignore').decode('ASCII')
 
-    return nome
+    # Garantindo que os conectivos "do, de, da, dos e das" não sejam levados em conta.
+    lista = []
+    nome = str.split(nome)
+    for i in range(len(nome)):
+        if len(nome[i]) == 1:
+            pass
+        elif (len(nome[i]) == 2) and ((nome[i] == 'do') or (nome[i] == 'de') or (nome[i] == 'da')):
+            pass
+        elif (len(nome[i]) == 3) and ((nome[i][:3] == 'dos') or (nome[i][:3] == 'das')):
+            pass
+        else:
+            lista.append(nome[i])
+
+    return lista
 
 # Função para garantir a integridade das datas.
 def boas_datas (data):
@@ -150,24 +163,14 @@ if animal_estimacao == 'y':
 else:
     animal_estimacao = False
 
-empresa_alvo = str.lower(input("\nO \"alvo\" trabalha? (y/n): "))
-while (empresa_alvo != 'y' and empresa_alvo != 'n'):
-    empresa_alvo = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
+evangelico = str.lower(input("\nO \"alvo\" é evangélico? (y/n): "))
+while (evangelico != 'y' and evangelico != 'n'):
+    evangelico = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
 
-if empresa_alvo == 'y':
-    empresa_alvo = input("\n Qual o nome da empresa onde o \"alvo\" trabalha? ")
-    empresa_alvo = bons_nomes(empresa_alvo)
+if evangelico == 'y':
+    evangelico = True
 else:
-    empresa_alvo = False
-
-religioso = str.lower(input("\nO \"alvo\" é religioso? (y/n): "))
-while (religioso != 'y' and religioso != 'n'):
-    religioso = str.lower(input("\nResponda apenas \"y\" ou \"n\": "))
-
-if religioso == 'y':
-    religioso = True
-else:
-    religioso = False
+    evangelico = False
 
 time = str.lower(input("\nO \"alvo\" torce por algum time? (y/n): "))
 
@@ -180,47 +183,15 @@ if time == 'y':
 else:
     time = False
 
-# Oranizando os dados para facilitar a manipulação:
-print("\nOrganizando os dados fornecidos.")
-
-lista_nomes_alvo = str.split(nome_completo_alvo)
-
-if casado:
-    lista_nomes_conjuge = str.split(nome_completo_conjuge)
-
-if filhos == 1:
-    lista_nomes_primeiro_filho = str.split(nome_completo_primeiro_filho)
-
-if filhos == 2:
-    lista_nomes_primeiro_filho = str.split(nome_completo_primeiro_filho)
-    lista_nomes_segundo_filho = str.split(nome_completo_segundo_filho)
-
-if filhos == 3:
-    lista_nomes_primeiro_filho = str.split(nome_completo_primeiro_filho)
-    lista_nomes_segundo_filho = str.split(nome_completo_segundo_filho)
-    lista_nomes_terceiro_filho = str.split(nome_completo_terceiro_filho)
-
-if filhos > 3:
-    lista_nomes_ultimo_filho = str.split(nome_completo_ultimo_filho)
-
-if animal_estimacao != False:
-    lista_animal = str.split(animal_estimacao)
-
-if empresa_alvo != False:
-    lista_empresa = str.split(empresa_alvo)
-
-if time != False:
-    lista_time = str.split(time)
-
-if religioso:
-    palavras_religiosas = ['Jesus', 'Cristo', 'Deus', 'Jesusvoltara', 'soJesussalva', 'Jesusestavoltando', 'EspiritoSanto', 'JesusCristo']
+# Caso seja evangélico, será tratado mais a frente.
 
 # O arquivo .txt que conterá a wordlist terá o primeiro nome do usuário.
-arquivo = str.capitalize(lista_nomes_alvo[0]) + '.txt'    
+arquivo = str.capitalize(nome_completo_alvo[0]) + '.txt'    
 
-# Hora do show!
+# Inicio dos trabalhos!
 gravado = True
 lista_provisoria = []
+lista_final = []
 
 def gravar(lista):
 
@@ -233,12 +204,27 @@ def gravar(lista):
         f = open(arquivo, 'w')
 
         for x in range(len(lista)):
+            # para que não existam palavras menores que "tamanho_minimo"
             if len(lista[x]) < int(tamanho_minimo):
                 pass
             else:
-                f.write(lista[x]+'\n')
+                # para que não existam palavras repetidas na wordlist
+                if lista[x] not in lista_final:
+                    lista_final.append(lista[x])
+
+        for i in range(len(lista_final)):
+            f.write(lista_final[i]+'\n')        
         
         f.close()
+
+def casados(lista1, lista2, data):
+    lista_provisoria.append(lista1[0]+'&'+lista2[0])
+    
+    if data:
+        lista_provisoria.append(lista1[0]+'&'+lista2[0]+data)
+        lista_provisoria.append(lista1[0]+'&'+lista2[0]+data[-6:])
+        lista_provisoria.append(lista1[0]+'&'+lista2[0]+data[-4:])
+        lista_provisoria.append(lista1[0]+'&'+lista2[0]+data[:2])
 
 def letras_e_datas(lista, data):
     
@@ -275,10 +261,10 @@ def so_letras (lista, data):
     for i in range(tamanho):
         
         if lista[i] not in listavazia:                                        # garantindo que não existam palavras repetidas no .txt
-            listavazia.append(str.lower(lista[i]))                            # junior, alves, quinto, terceiro    
-            listavazia.append(str.capitalize(lista[i]))                       # Junior, Alves, Quinto, Terceiro
-            listavazia.append(str.swapcase(str.capitalize(lista[i])))         # jUNIOR, aLVES, qUINTO, tERCEIRO
-            listavazia.append(str.upper(lista[i]))                            # JUNIOR, ALVES, QUINTO, TERCEIRO
+            listavazia.append(str.lower(lista[i]))                            # tudo minúsculo    
+            listavazia.append(str.capitalize(lista[i]))                       # Primeira maiúscula
+            listavazia.append(str.swapcase(str.capitalize(lista[i])))         # primeira minúscula, o resto maiúsculo
+            listavazia.append(str.upper(lista[i]))                            # Tudo maiúsculo
 
     if tamanho == 2:
         listavazia.append(str.lower(lista[0]+lista[1]))                       # primeiro nome + segundo nome, minúsculos
@@ -293,7 +279,8 @@ def so_letras (lista, data):
         listavazia.append(str.upper(lista[0]+lista[-1]))                      # primeiro e último nome, maiúsculos
         listavazia.append(str.capitalize(lista[0])+str.capitalize(lista[-1])) # primeiro e último nome, com as iniciais maiúsculas    
 
-    temp = str.capitalize(lista[0])                 # para unir o primeiro nome com as demais iniciais
+    # para unir o primeiro nome com as demais iniciais
+    temp = str.capitalize(lista[0])                 
 
     for a in range(tamanho - 1):
         temp += str.upper(lista[a+1][0])        
@@ -303,7 +290,8 @@ def so_letras (lista, data):
         listavazia.append(str.lower(temp))
         listavazia.append(str.upper(temp))
 
-    temp2 = str.lower(lista[0][0])                  # para unir as iniciais
+    # para unir as iniciais
+    temp2 = str.lower(lista[0][0])                  
 
     for a in range(tamanho - 1):
         temp2 += str.lower(lista[a+1][0])
@@ -315,25 +303,49 @@ def so_letras (lista, data):
     letras_e_datas(listavazia, data)
 
 
-so_letras(lista_nomes_alvo, data_nascimento_alvo)
+so_letras(nome_completo_alvo, data_nascimento_alvo)
 
 if casado:
-    so_letras(lista_nomes_conjuge, data_nascimento_conjuge)
+    so_letras(nome_completo_conjuge, data_nascimento_conjuge)
+    casados(nome_completo_alvo, nome_completo_conjuge, data_casamento)
 
 if filhos == 1:
-    so_letras(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
+    so_letras(nome_completo_primeiro_filho, data_nascimento_primeiro_filho)
 
 if filhos == 2:
-    so_letras(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
-    so_letras(lista_nomes_segundo_filho, data_nascimento_segundo_filho)
+    so_letras(nome_completo_primeiro_filho, data_nascimento_primeiro_filho)
+    so_letras(nome_completo_segundo_filho, data_nascimento_segundo_filho)
 
 if filhos == 3:
-    so_letras(lista_nomes_primeiro_filho, data_nascimento_primeiro_filho)
-    so_letras(lista_nomes_segundo_filho, data_nascimento_segundo_filho)
-    so_letras(lista_nomes_terceiro_filho, data_nascimento_terceiro_filho)
+    so_letras(nome_completo_primeiro_filho, data_nascimento_primeiro_filho)
+    so_letras(nome_completo_segundo_filho, data_nascimento_segundo_filho)
+    so_letras(nome_completo_terceiro_filho, data_nascimento_terceiro_filho)
 
 if filhos > 3:
-    so_letras(lista_nomes_ultimo_filho)
+    so_letras(nome_completo_ultimo_filho)
+
+if animal_estimacao != False:
+    so_letras(animal_estimacao, False) # Já passando a data como False.
+
+if evangelico != False:
+
+    data_atual = date.today()
+
+    palavras_comuns = ['Jesus', 'jesus', 'Cristo', 'cristo', 'Deus', 'deus', 
+        'Jesusvoltara', 'jesusvoltara', 'sojesussalva', 'jesusestavoltando',  
+        'soJesussalva', 'Jesusestavoltando', 'EspiritoSanto', 'JesusCristo', 
+        'espiritosanto', 'jesuscristo']
+
+    for i in range(len(palavras_comuns)):
+        lista_provisoria.append(palavras_comuns[i])
+
+        x = 0
+
+        while x < 4:
+            lista_provisoria.append(palavras_comuns[i]+str(data_atual.year - x))
+            x += 1
+
+# if time != False:
 
 gravar(lista_provisoria)
 
