@@ -10,11 +10,11 @@ Perguntas presentes no código:
  * Qual o nome completo do "alvo"?
  * Sabe a data de nascimento?
  * O "alvo" é casado(a)?
- *     Qual o nome completo do cônjuge?
- *     Sabe a data de nascimento do cônjuge?
- *     Sabe a data de casamento?
+ *    Qual o nome completo do cônjuge?
+ *    Sabe a data de nascimento do cônjuge?
+ *    Sabe a data de casamento?
  * Possui filhos?
- *     Nome dos filhos e datas, se possível.
+ *    Nome dos filhos e datas, se possível.
  * Possui animal de estimação?
  * É evangélico?
  * Torce por algum time?
