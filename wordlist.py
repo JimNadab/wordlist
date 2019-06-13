@@ -4,13 +4,13 @@
 
 # Para remover acentos e ç dos nomes;
 # Retirado de: https://wiki.python.org.br/RemovedorDeAcentos
-# Medida adotada, pois caracteres assim não são aceitos atualmente
+# Medida adotada, pois caracteres assim não são aceitos em redes wifi.
 from unicodedata import normalize
 from datetime import date
 
 print ("""  
 : Criando uma wordlist personalizada.
-: 06.05.2019
+: 13.06.2019
 : Jim Nadab.
             
 Forneça os dados que trabalharemos.
@@ -197,6 +197,7 @@ def gravar(lista):
 
     global gravado
     
+    # Se a lista estiver vazia, nada será gravado!
     if len(lista) == 0:
         gravado = False
         return
@@ -226,13 +227,23 @@ def casados(lista1, lista2, data):
         lista_provisoria.append(lista1[0]+'&'+lista2[0]+data[-4:])
         lista_provisoria.append(lista1[0]+'&'+lista2[0]+data[:2])
 
-def letras_e_datas(lista, data):
+def letras_e_numeros(lista, data):
     
     listavazia = []
 
+    # para adicionar numeros de 1 a 6 as palavras.
+    for i in range(len(lista)):
+        listavazia.append(lista[i])
+
+        numeros = ''
+        z = 1
+        while z < 7:
+            numeros += str(z) 
+            listavazia.append(lista[i]+numeros)
+            z += 1
+
     if data:
         for i in range(len(lista)):
-            listavazia.append(lista[i])
             listavazia.append(lista[i]+data[:])
             listavazia.append(lista[i]+data[:2])
             listavazia.append(lista[i]+data[-4:])
@@ -300,7 +311,7 @@ def so_letras (lista, data):
         listavazia.append(temp2)
         listavazia.append(str.upper(temp2))
     
-    letras_e_datas(listavazia, data)
+    letras_e_numeros(listavazia, data)
 
 
 so_letras(nome_completo_alvo, data_nascimento_alvo)
@@ -345,7 +356,26 @@ if evangelico != False:
             lista_provisoria.append(palavras_comuns[i]+str(data_atual.year - x))
             x += 1
 
-# if time != False:
+if time != False:
+
+    # unindo os possíveis nomes compostos dos times
+    time_junto = ''
+    for i in range(len(time)):
+        time_junto += time[i]
+
+    # rebaixando a caixa para comparar com as chaves dos dicionarios
+    time_junto = time_junto.lower() 
+
+    dicionario_times = {'vasco': ['vasco', 'vascao'], 'saopaulo': ['saopaulo', 'tricolor'], 
+        'santos': ['santos', 'peixe'], 'palmeiras': ['palmeiras', 'verdao'], 
+        'internacional': ['internacional', 'inter',], 'gremio': ['gremio', 'imortal'], 
+        'fluminense': ['fluminense', 'fluzao'], 'flamengo': ['flamengo', 'mengao', 'urubu'], 
+        'botafogo': ['botafogo', 'fogao'], 'corinthians': ['corinthians', 'corintias', 'timao']}
+    
+    # caso o time pertença ao dicionario, ele estrará na wordlist
+    if time_junto in dicionario_times:
+        so_letras(dicionario_times[time_junto], False)
+
 
 gravar(lista_provisoria)
 
@@ -354,4 +384,4 @@ print("\nGerando wordlist.")
 if gravado:
     print("Wordlist " +arquivo+ " criada com sucesso.\n")
 else:
-    print("Wordlist não pode ser gravada!\n")
+    print("Wordlist não pode ser gravada, pois os dados fornecidos são insuficientes!\n")
